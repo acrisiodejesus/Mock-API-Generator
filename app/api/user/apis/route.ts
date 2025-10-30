@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
-import { adminDb } from "@/lib/firebase-admin"; // seu arquivo de inicialização Admin
-import { collection, doc, getDocs, query, where, addDoc, updateDoc, deleteDoc, DocumentData, QueryDocumentSnapshot } from "firebase-admin/firestore";
+import { adminDb } from "@/lib/firebase-admin"; 
+import { Timestamp } from "firebase-admin/firestore";
 
-// Define o runtime para Node.js padrão (Serverless), não Edge
 export const runtime = "nodejs";
+
+function validateFields(fields: any[]): boolean {
+  if (!Array.isArray(fields)) return false;
+  return fields.every(f => typeof f.name === "string" && typeof f.type === "string");
+}
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -11,13 +15,15 @@ export async function GET(request: Request) {
   if (!userId) return NextResponse.json({ error: "userId é obrigatório" }, { status: 400 });
 
   try {
-    const q = query(collection(adminDb, "apis"), where("userId", "==", userId));
-    const querySnapshot = await getDocs(q);
-    const apisData = querySnapshot.docs.map((doc: QueryDocumentSnapshot<DocumentData>) => ({
+    const apisRef = adminDb.collection("apis");
+    const snapshot = await apisRef.where("userId", "==", userId).get();
+
+    const apisData = snapshot.docs.map(doc => ({
       id: doc.id,
       ...doc.data(),
-      createdAt: doc.data().createdAt?.toDate?.() || new Date(),
+      createdAt: (doc.data().createdAt as Timestamp)?.toDate() || new Date(),
     }));
+
     return NextResponse.json(apisData);
   } catch (error) {
     console.error("Erro ao buscar APIs:", error);
@@ -33,35 +39,48 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Campos obrigatórios faltando" }, { status: 400 });
     }
 
-    // Gera endpoint
-    const endpointId = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    if (!validateFields(body.fields || [])) {
+      return NextResponse.json({ error: "Campos inválidos em 'fields'" }, { status: 400 });
+    }
+
     const origin = `${request.headers.get("x-forwarded-proto") || "https"}://${request.headers.get("host")}`;
+    const endpointId = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
     const endpoint = `${origin}/api/${endpointId}`;
 
-    // Busca plano do usuário
-    const userSnapshot = await getDocs(query(collection(adminDb, "users"), where("uid", "==", body.userId)));
+    const usersRef = adminDb.collection("users");
+    const userSnapshot = await usersRef.where("uid", "==", body.userId).get();
     let userPlan = "free";
     if (!userSnapshot.empty) {
       const userData = userSnapshot.docs[0].data();
       userPlan = userData.plan || "free";
     }
 
-    // Conta APIs existentes
-    const apisSnapshot = await getDocs(query(collection(adminDb, "apis"), where("userId", "==", body.userId)));
+    const apisRef = adminDb.collection("apis");
+    const existingApi = await apisRef
+      .where("userId", "==", body.userId)
+      .where("endpoint", "==", endpoint)
+      .get();
+
+    if (!existingApi.empty) {
+      return NextResponse.json({ error: "Você já possui uma API com esse nome" }, { status: 409 });
+    }
+
+    const apisSnapshot = await apisRef.where("userId", "==", body.userId).get();
     if (userPlan === "free" && apisSnapshot.size >= 2) {
       return NextResponse.json({ error: "Limite de APIs gratuitas atingido. Faça upgrade para Pro." }, { status: 403 });
     }
 
-    const docRef = await addDoc(collection(adminDb, "apis"), {
+  
+    const docRef = await apisRef.add({
       userId: body.userId,
       name: body.name,
       description: body.description || "",
       endpoint,
       fields: body.fields || [],
-      createdAt: new Date(),
+      createdAt: Timestamp.now(),
     });
 
-    return NextResponse.json({ id: docRef.id }, { status: 201 });
+    return NextResponse.json({ id: docRef.id, endpoint }, { status: 201 });
   } catch (error) {
     console.error("Erro ao criar API:", error);
     return NextResponse.json({ error: "Erro ao criar API" }, { status: 500 });
@@ -75,10 +94,16 @@ export async function PUT(request: Request) {
 
   try {
     const body = await request.json();
-    await updateDoc(doc(adminDb, "apis", apiId), {
+
+    if (body.fields && !validateFields(body.fields)) {
+      return NextResponse.json({ error: "Campos inválidos em 'fields'" }, { status: 400 });
+    }
+
+    await adminDb.collection("apis").doc(apiId).update({
       ...body,
-      updatedAt: new Date(),
+      updatedAt: Timestamp.now(),
     });
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Erro ao atualizar API:", error);
@@ -92,7 +117,7 @@ export async function DELETE(request: Request) {
   if (!apiId) return NextResponse.json({ error: "apiId é obrigatório" }, { status: 400 });
 
   try {
-    await deleteDoc(doc(adminDb, "apis", apiId));
+    await adminDb.collection("apis").doc(apiId).delete();
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Erro ao deletar API:", error);
