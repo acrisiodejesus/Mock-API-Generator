@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { headers } from "next/headers";
 import { db } from "@/lib/firebase";
 import { collection, query, where, getDocs, addDoc, deleteDoc, doc, updateDoc, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 
@@ -30,12 +31,13 @@ export async function POST(request: Request) {
     // }
 
     const endpointId = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    const protocol = body.headers["x-forwarded-proto"] || "http";
-    const host = body.headers.host;
+    const h = headers();
+    const protocol = h.get("x-forwarded-proto") || "http";
+    const host = h.get("host");
     const origin = `${protocol}://${host}`;
-    const endpoint = `${origin}/api/${endpointId}`;  
+    const endpoint = `${origin}/api/${endpointId}`;
     const userDoc = await getDocs(query(collection(db, "users"), where("uid", "==", body.userId)));
-    console.log(userDoc, endpoint)
+   
     let userPlan: string = "free";
     if (!userDoc.empty) {
       const userData = userDoc.docs[0].data();
