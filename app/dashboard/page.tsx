@@ -93,16 +93,13 @@ export default function DashboardPage() {
       }
 
       // Load user APIs
-      const apisRes = await fetch("/api/user/apis", {
-        credentials: "include", // Include cookies in request
+      const apisRes = await fetch(`/api/user/apis?userId=${user.uid}`, {
+        credentials: "include",
       });
-
-      console.log("APIs response status:", apisRes.status);
 
       if (apisRes.ok) {
         const apisData = await apisRes.json();
-        console.log("APIs data loaded:", apisData);
-        setApis(apisData.apis || []);
+        setApis(apisData || []);
       } else {
         console.error("Failed to load APIs:", await apisRes.text());
       }
