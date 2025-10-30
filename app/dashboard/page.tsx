@@ -136,7 +136,7 @@ export default function DashboardPage() {
   };
 
   const copyEndpoint = (endpoint: string) => {
-    navigator.clipboard.writeText(`${window.location.origin}/api/${endpoint}`);
+    navigator.clipboard.writeText(`${endpoint}`);
   };
 
   if (authLoading || loading) {
@@ -230,7 +230,7 @@ export default function DashboardPage() {
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <code className="text-xs bg-muted px-2 py-1 rounded flex-1 truncate">
-                        /api/{api.endpoint}
+                        {api.endpoint}
                       </code>
                       <Button
                         size="sm"
@@ -250,7 +250,7 @@ export default function DashboardPage() {
                     asChild
                   >
                     <a
-                      href={`/api/${api.endpoint}`}
+                      href={api.endpoint}
                       target="_blank"
                       rel="noopener noreferrer"
                     >
