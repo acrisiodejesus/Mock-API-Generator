@@ -77,34 +77,29 @@ export default function NewAPIPage() {
     setLoading(true);
 
     try {
-      console.log("Creating new API:", { name, description, fields });
+      const endpoint = name.trim().toLowerCase().replace(/\s+/g, "-");
+      const validFields = fields.filter((f) => f.name.trim() && f.type.trim());
 
       const res = await fetch("/api/user/apis", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          userId: user?.uid,
+          username: user?.displayName || user?.email?.split("@")[0],
           name,
+          endpoint,
           description,
-          fields,
+          fields: validFields,
         }),
       });
 
-      console.log("Create API response status:", res.status);
-
       if (res.ok) {
-        console.log("API created successfully, redirecting to dashboard");
         router.push("/dashboard");
       } else {
         const errorData = await res.json();
-        console.error("Failed to create API:", errorData);
         setError(errorData.error || t("newApi.error"));
       }
     } catch (err) {
-      console.error("Error creating API:", err);
       setError(t("newApi.error"));
     } finally {
       setLoading(false);

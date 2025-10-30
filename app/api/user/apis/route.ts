@@ -45,7 +45,8 @@ export async function POST(request: Request) {
 
     const origin = `${request.headers.get("x-forwarded-proto") || "https"}://${request.headers.get("host")}`;
     const endpointId = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    const endpoint = `${origin}/api/${endpointId}`;
+   const username = body.username || body.displayName || body.email.split("@")[0];
+const endpoint = `${origin}/api/${username}/${endpointId}`;
 
     const usersRef = adminDb.collection("users");
     const userSnapshot = await usersRef.where("uid", "==", body.userId).get();
@@ -111,18 +112,12 @@ export async function PUT(request: Request) {
   }
 }
 
-export async function DELETE(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const apiId = searchParams.get("apiId");
-  if (!apiId) {
-    return NextResponse.json({ error: "apiId é obrigatório" }, { status: 400 });
-  }
+export async function DELETE(request: Request, { params }: { params: { apiId: string } }) {
+  const { apiId } = params;
+  if (!apiId) return NextResponse.json({ error: "apiId é obrigatório" }, { status: 400 });
 
   try {
-    const docRef = adminDb.collection("apis").doc(apiId);
-  
-    await docRef.delete();
-
+    await adminDb.collection("apis").doc(apiId).delete();
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Erro ao deletar API:", error);
