@@ -86,6 +86,7 @@ export default function NewAPIPage() {
         },
         credentials: "include",
         body: JSON.stringify({
+          userId: user?.uid,
           name,
           description,
           fields,

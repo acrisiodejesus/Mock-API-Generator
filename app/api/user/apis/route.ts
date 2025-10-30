@@ -25,9 +25,15 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    if (!body.userId || !body.name || !body.endpoint) {
-      return NextResponse.json({ error: "Campos obrigatórios faltando" }, { status: 400 });
-    }
+    // if (!body.userId || !body.name || !body.endpoint) {
+    //   return NextResponse.json({ error: "Campos obrigatórios faltando" }, { status: 400 });
+    // }
+
+    const endpointId = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    const protocol = body.headers["x-forwarded-proto"] || "http";
+    const host = body.headers.host;
+    const origin = `${protocol}://${host}`;
+    const endpoint = `${origin}/api/${endpointId}`;  
     const userDoc = await getDocs(query(collection(db, "users"), where("uid", "==", body.userId)));
     let userPlan: string = "free";
     if (!userDoc.empty) {
@@ -43,7 +49,7 @@ export async function POST(request: Request) {
       userId: body.userId,
       name: body.name,
       description: body.description || "",
-      endpoint: body.endpoint,
+      endpoint: endpoint,
       fields: body.fields || [],
       createdAt: new Date(),
     });
