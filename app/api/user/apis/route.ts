@@ -24,43 +24,64 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  // Pega o host e protocolo antes do try
+  const h = headers();
+  const protocol = h.get("x-forwarded-proto") || "http";
+  const host = h.get("host");
+  const origin = `${protocol}://${host}`;
+
   try {
     const body = await request.json();
-    // if (!body.userId || !body.name || !body.endpoint) {
-    //   return NextResponse.json({ error: "Campos obrigatórios faltando" }, { status: 400 });
-    // }
 
-    const endpointId = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    const h = headers();
-    const protocol = h.get("x-forwarded-proto") || "http";
-    const host = h.get("host");
-    const origin = `${protocol}://${host}`;
+    if (!body.userId || !body.name) {
+      return NextResponse.json({ error: "Campos obrigatórios faltando" }, { status: 400 });
+    }
+
+    const endpointId = body.name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+
     const endpoint = `${origin}/api/${endpointId}`;
-    const userDoc = await getDocs(query(collection(db, "users"), where("uid", "==", body.userId)));
-   
-    let userPlan: string = "free";
-    if (!userDoc.empty) {
-      const userData = userDoc.docs[0].data();
+
+    const userDoc = await getDocs(
+      query(collection(db, "users"), where("uid", "==", body.userId))
+    );
+
+    let userPlan = "free";
+    if (userDoc.size > 0) {
+      const userData = userDoc.docs[0].data() || {};
       userPlan = userData.plan || "free";
     }
-    const apisSnapshot = await getDocs(query(collection(db, "apis"), where("userId", "==", body.userId)));
+
+    const apisSnapshot = await getDocs(
+      query(collection(db, "apis"), where("userId", "==", body.userId))
+    );
     const apiCount = apisSnapshot.size;
+
     if (userPlan === "free" && apiCount >= 2) {
-      return NextResponse.json({ error: "Limite de APIs gratuitas atingido. Faça upgrade para Pro." }, { status: 403 });
+      return NextResponse.json(
+        { error: "Limite de APIs gratuitas atingido. Faça upgrade para Pro." },
+        { status: 403 }
+      );
     }
+
     const docRef = await addDoc(collection(db, "apis"), {
       userId: body.userId,
       name: body.name,
       description: body.description || "",
-      endpoint: endpoint,
+      endpoint,
       fields: body.fields || [],
       createdAt: new Date(),
     });
+
     return NextResponse.json({ id: docRef.id }, { status: 201 });
   } catch (error) {
+    console.error("Erro interno:", error);
     return NextResponse.json({ error: "Erro ao criar API" }, { status: 500 });
   }
 }
+
 
 export async function PUT(request: Request) {
   const { searchParams } = new URL(request.url);
