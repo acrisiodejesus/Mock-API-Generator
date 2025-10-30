@@ -63,7 +63,7 @@ function generateName(): string {
     "Pedro",
     "Ana",
     "Carlos",
-    "Juliana",
+    "Mohamed",
     "Lucas",
     "Fernanda",
     "Rafael",
@@ -72,16 +72,16 @@ function generateName(): string {
     "Beatriz",
   ]
   const lastNames = [
-    "Silva",
-    "Santos",
-    "Oliveira",
-    "Souza",
-    "Rodrigues",
-    "Ferreira",
-    "Alves",
-    "Pereira",
-    "Lima",
-    "Gomes",
+    "Matola",
+    "Maguembe",
+    "Rosario",
+    "Nhamtumbo",
+    "Mucussete",
+    "Machava",
+    "Crocodilo",
+    "Manjate",
+    "Adamo",
+    "Sitoe",
   ]
   const firstName = firstNames[Math.floor(Math.random() * firstNames.length)]
   const lastName = lastNames[Math.floor(Math.random() * lastNames.length)]

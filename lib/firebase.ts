@@ -35,13 +35,13 @@ if (isConfigValid()) {
     app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0]
     auth = getAuth(app)
     db = getFirestore(app)
-    console.log("[v0] Firebase initialized successfully")
+    console.log("Firebase initialized successfully")
   } catch (error) {
-    console.error("[v0] Firebase initialization error:", error)
+    console.error("Firebase initialization error:", error)
   }
 } else {
   const missing = getMissingVars()
-  console.warn(`[v0] Firebase configuration is incomplete. Missing variables: ${missing.join(", ")}`)
+  console.warn(`Firebase configuration is incomplete. Missing variables: ${missing.join(", ")}`)
 }
 
 export { app, auth, db, isConfigValid, getMissingVars }
