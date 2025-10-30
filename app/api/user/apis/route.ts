@@ -24,10 +24,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  // Pega o host e protocolo antes do try
-  const h = headers();
-  const protocol = h.get("x-forwarded-proto") || "http";
-  const host = h.get("host");
+  
+  const protocol = request.headers.get("x-forwarded-proto") || "http";
+const host = request.headers.get("host");
   const origin = `${protocol}://${host}`;
 
   try {
