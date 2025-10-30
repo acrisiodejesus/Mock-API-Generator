@@ -35,6 +35,7 @@ export async function POST(request: Request) {
     const origin = `${protocol}://${host}`;
     const endpoint = `${origin}/api/${endpointId}`;  
     const userDoc = await getDocs(query(collection(db, "users"), where("uid", "==", body.userId)));
+    console.log(userDoc, endpoint)
     let userPlan: string = "free";
     if (!userDoc.empty) {
       const userData = userDoc.docs[0].data();
