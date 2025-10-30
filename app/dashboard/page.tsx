@@ -92,7 +92,6 @@ export default function DashboardPage() {
         console.error("Failed to load plan:", await planRes.text());
       }
 
-      // Load user APIs
       const apisRes = await fetch(`/api/user/apis?userId=${user.uid}`, {
         credentials: "include",
       });

@@ -114,10 +114,15 @@ export async function PUT(request: Request) {
 export async function DELETE(request: Request) {
   const { searchParams } = new URL(request.url);
   const apiId = searchParams.get("apiId");
-  if (!apiId) return NextResponse.json({ error: "apiId é obrigatório" }, { status: 400 });
+  if (!apiId) {
+    return NextResponse.json({ error: "apiId é obrigatório" }, { status: 400 });
+  }
 
   try {
-    await adminDb.collection("apis").doc(apiId).delete();
+    const docRef = adminDb.collection("apis").doc(apiId);
+  
+    await docRef.delete();
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Erro ao deletar API:", error);
