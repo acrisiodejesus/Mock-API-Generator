@@ -1,22 +1,29 @@
-"use client"
+"use client";
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  type ReactNode,
+} from "react";
 
-type Locale = "pt" | "en"
+type Locale = "pt" | "en";
 
 interface I18nContextType {
-  locale: Locale
-  setLocale: (locale: Locale) => void
-  t: (key: string) => string
+  locale: Locale;
+  setLocale: (locale: Locale) => void;
+  t: (key: string) => string;
 }
 
-const I18nContext = createContext<I18nContextType | undefined>(undefined)
+const I18nContext = createContext<I18nContextType | undefined>(undefined);
 
 const translations = {
   pt: {
     "app.name": "XingLing API",
     "app.tagline": "Crie APIs fake em segundos",
-    "app.description": "Gere dados fake realistas para seus projetos de desenvolvimento",
+    "app.description":
+      "Gere dados fake realistas para seus projetos de desenvolvimento",
     "nav.home": "Início",
     "nav.dashboard": "Dashboard",
     "nav.login": "Entrar",
@@ -39,16 +46,19 @@ const translations = {
     "auth.passwordTooShort": "A senha deve ter pelo menos 6 caracteres",
     "auth.backHome": "Voltar para o início",
     "hero.title": "Crie APIs Fake em Segundos",
-    "hero.subtitle": "Gere dados realistas para desenvolvimento e testes sem configuração complexa",
+    "hero.subtitle":
+      "Gere dados realistas para desenvolvimento e testes sem configuração complexa",
     "hero.cta": "Começar Grátis",
     "hero.secondary": "Ver Documentação",
     "features.title": "Como Funciona",
-    "features.step1.title": "Defina a Estrutura",
-    "features.step1.desc": "Crie campos personalizados com tipos de dados variados",
-    "features.step2.title": "Gere Dados",
+    "features.step1.title": "Rapido",
+    "features.step1.desc":
+      "Crie APIS fakes sem necessidade de bibliotecas adicionais de forma rápida e fácil",
+    "features.step2.title": "Dados Automaticos",
     "features.step2.desc": "Dados fake realistas são gerados automaticamente",
     "features.step3.title": "Use a API",
-    "features.step3.desc": "Acesse via REST API de qualquer aplicação",
+    "features.step3.desc":
+      "Acesse via REST API de qualquer aplicação com qualquer linguagem",
     "pricing.title": "Planos Simples",
     "pricing.free.title": "Gratuito",
     "pricing.free.price": "$0",
@@ -110,20 +120,24 @@ const translations = {
     "newApi.cancel": "Cancelar",
     "newApi.error": "Erro ao criar API",
     "firebase.notConfigured": "Firebase não configurado",
-    "firebase.notConfiguredDesc": "Configure as variáveis de ambiente do Firebase para usar a aplicação",
+    "firebase.notConfiguredDesc":
+      "Configure as variáveis de ambiente do Firebase para usar a aplicação",
     "dashboard.subtitle": "Gerencie suas APIs fake",
     "dashboard.newApi": "Nova API",
     "dashboard.noApis": "Nenhuma API criada ainda",
     "dashboard.createFirst": "Criar Primeira API",
     "dashboard.limitReached": "Limite Atingido",
-    "dashboard.limitReachedDesc": "Você atingiu o limite de 2 APIs no plano gratuito.",
+    "dashboard.limitReachedDesc":
+      "Você atingiu o limite de 2 APIs no plano gratuito.",
     "dashboard.upgradeToPro": "Fazer Upgrade para Pro",
-    "dashboard.deleteConfirmDesc": "Esta ação não pode ser desfeita. A API será deletada permanentemente.",
+    "dashboard.deleteConfirmDesc":
+      "Esta ação não pode ser desfeita. A API será deletada permanentemente.",
   },
   en: {
     "app.name": "XingLing API",
     "app.tagline": "Create fake APIs in seconds",
-    "app.description": "Generate realistic fake data for your development projects",
+    "app.description":
+      "Generate realistic fake data for your development projects",
     "nav.home": "Home",
     "nav.dashboard": "Dashboard",
     "nav.login": "Login",
@@ -146,13 +160,15 @@ const translations = {
     "auth.passwordTooShort": "Password must be at least 6 characters",
     "auth.backHome": "Back to home",
     "hero.title": "Create Fake APIs in Seconds",
-    "hero.subtitle": "Generate realistic data for development and testing without complex setup",
+    "hero.subtitle":
+      "Generate realistic data for development and testing without complex setup",
     "hero.cta": "Get Started Free",
     "hero.secondary": "View Documentation",
     "features.title": "How It Works",
-    "features.step1.title": "Define Structure",
-    "features.step1.desc": "Create custom fields with various data types",
-    "features.step2.title": "Generate Data",
+    "features.step1.title": "Fast",
+    "features.step1.desc":
+      "Create fake APIs without extra libraries quickly and easily",
+    "features.step2.title": "Automatic Data",
     "features.step2.desc": "Realistic fake data is generated automatically",
     "features.step3.title": "Use the API",
     "features.step3.desc": "Access via REST API from any application",
@@ -194,7 +210,8 @@ const translations = {
     "dashboard.plan": "Plan",
     "dashboard.apis": "APIs",
     "dashboard.limit": "Limit reached",
-    "dashboard.limitDesc": "You have reached the limit of 2 APIs on the free plan",
+    "dashboard.limitDesc":
+      "You have reached the limit of 2 APIs on the free plan",
     "dashboard.upgrade": "Upgrade to Pro",
     "dashboard.endpoint": "Endpoint",
     "dashboard.copy": "Copy",
@@ -217,44 +234,51 @@ const translations = {
     "newApi.cancel": "Cancel",
     "newApi.error": "Error creating API",
     "firebase.notConfigured": "Firebase not configured",
-    "firebase.notConfiguredDesc": "Configure Firebase environment variables to use the application",
+    "firebase.notConfiguredDesc":
+      "Configure Firebase environment variables to use the application",
     "dashboard.subtitle": "Manage your fake APIs",
     "dashboard.newApi": "New API",
     "dashboard.noApis": "No APIs created yet",
     "dashboard.createFirst": "Create First API",
     "dashboard.limitReached": "Limit Reached",
-    "dashboard.limitReachedDesc": "You have reached the limit of 2 APIs on the free plan.",
+    "dashboard.limitReachedDesc":
+      "You have reached the limit of 2 APIs on the free plan.",
     "dashboard.upgradeToPro": "Upgrade to Pro",
-    "dashboard.deleteConfirmDesc": "This action cannot be undone. The API will be permanently deleted.",
+    "dashboard.deleteConfirmDesc":
+      "This action cannot be undone. The API will be permanently deleted.",
   },
-}
+};
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>("pt")
+  const [locale, setLocaleState] = useState<Locale>("pt");
 
   useEffect(() => {
-    const savedLocale = localStorage.getItem("locale") as Locale
+    const savedLocale = localStorage.getItem("locale") as Locale;
     if (savedLocale && (savedLocale === "pt" || savedLocale === "en")) {
-      setLocaleState(savedLocale)
+      setLocaleState(savedLocale);
     }
-  }, [])
+  }, []);
 
   const setLocale = (newLocale: Locale) => {
-    setLocaleState(newLocale)
-    localStorage.setItem("locale", newLocale)
-  }
+    setLocaleState(newLocale);
+    localStorage.setItem("locale", newLocale);
+  };
 
   const t = (key: string): string => {
-    return translations[locale][key as keyof typeof translations.pt] || key
-  }
+    return translations[locale][key as keyof typeof translations.pt] || key;
+  };
 
-  return <I18nContext.Provider value={{ locale, setLocale, t }}>{children}</I18nContext.Provider>
+  return (
+    <I18nContext.Provider value={{ locale, setLocale, t }}>
+      {children}
+    </I18nContext.Provider>
+  );
 }
 
 export function useI18n() {
-  const context = useContext(I18nContext)
+  const context = useContext(I18nContext);
   if (!context) {
-    throw new Error("useI18n must be used within I18nProvider")
+    throw new Error("useI18n must be used within I18nProvider");
   }
-  return context
+  return context;
 }

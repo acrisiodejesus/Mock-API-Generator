@@ -64,7 +64,7 @@ export default function Home() {
 
             <div className="bg-card border border-border rounded-lg p-6 space-y-3">
               <div className="h-12 w-12 rounded-lg bg-accent/10 flex items-center justify-center">
-                <Database className="h-6 w-6 text-accent" />
+                <Database className="h-6 w-6 text-primary" />
               </div>
               <h3 className="text-xl font-semibold">
                 {t("features.step2.title")}
@@ -77,18 +77,6 @@ export default function Home() {
             <div className="bg-card border border-border rounded-lg p-6 space-y-3">
               <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center">
                 <Code className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="text-xl font-semibold">
-                {t("features.step3.title")}
-              </h3>
-              <p className="text-muted-foreground leading-relaxed">
-                {t("features.step3.desc")}
-              </p>
-            </div>
-
-            <div className="bg-card border border-border rounded-lg p-6 space-y-3">
-              <div className="h-12 w-12 rounded-lg bg-accent/10 flex items-center justify-center">
-                <Globe className="h-6 w-6 text-accent" />
               </div>
               <h3 className="text-xl font-semibold">
                 {t("features.step3.title")}
