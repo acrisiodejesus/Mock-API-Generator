@@ -17,7 +17,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { FirebaseSetupBanner } from "@/components/firebase-setup-banner";
 import { useI18n } from "@/lib/i18n-context";
 import {
   Plus,
@@ -109,7 +108,23 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
+  const handleGoPro = async () => {async () => {
+                  try {
+                    const res = await fetch("/api/gopro", { method: "POST" });
+                    const data = await res.json();
 
+                    if (data.checkout_url) {
+                      window.location.href = data.checkout_url;
+                    } else {
+                      alert(
+                        "Erro ao criar link de pagamento. Tenta novamente."
+                      );
+                    }
+                  } catch (err) {
+                    console.error("Erro ao iniciar pagamento:", err);
+                    alert("Ocorreu um erro. Tente mais tarde.");
+                  }
+                }
   const handleDelete = async (id: string) => {
     if (!user) return;
 
@@ -162,8 +177,7 @@ export default function DashboardPage() {
       <Header />
 
       <main className="flex-1 container mx-auto px-4 py-8">
-        <FirebaseSetupBanner />
-
+   
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold">{t("dashboard.title")}</h1>
@@ -190,23 +204,7 @@ export default function DashboardPage() {
             ) : (
               <Button
                 className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white hover:from-yellow-500 hover:via-orange-600 hover:to-red-600"
-                onClick={async () => {
-                  try {
-                    const res = await fetch("/api/gopro", { method: "POST" });
-                    const data = await res.json();
-
-                    if (data.checkout_url) {
-                      window.location.href = data.checkout_url;
-                    } else {
-                      alert(
-                        "Erro ao criar link de pagamento. Tenta novamente."
-                      );
-                    }
-                  } catch (err) {
-                    console.error("Erro ao iniciar pagamento:", err);
-                    alert("Ocorreu um erro. Tente mais tarde.");
-                  }
-                }}
+                onClick={() => handleGoPro()}
               >
                 <StarsIcon className="h-4 w-4 mr-2" />
                 {t("dashboard.goPro")}
@@ -221,8 +219,8 @@ export default function DashboardPage() {
             <AlertTitle>{t("dashboard.limitReached")}</AlertTitle>
             <AlertDescription>
               {t("dashboard.limitReachedDesc")}
-              <Button variant="link" className="px-2" asChild>
-                <a href="#pricing">{t("dashboard.upgradeToPro")}</a>
+              <Button variant="link" className="px-2" onClick={()=> handleGoPro} asChild>
+                {t("dashboard.upgradeToPro")}
               </Button>
             </AlertDescription>
           </Alert>

@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Header } from "@/components/header";
 import { Database, Code, Zap, Globe, Check } from "lucide-react";
-import { FirebaseSetupBanner } from "@/components/firebase-setup-banner";
+
 import { useI18n } from "@/lib/i18n-context";
 import Link from "next/link";
 
@@ -14,9 +14,7 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1">
-        <div className="container mx-auto px-4 pt-6">
-          <FirebaseSetupBanner />
-        </div>
+        <div className="container mx-auto px-4 pt-6"></div>
         <section className="container mx-auto px-4 py-24 text-center">
           <div className="max-w-4xl mx-auto space-y-6">
             <h1 className="text-5xl md:text-6xl font-bold leading-tight text-balance">
