@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   const origin = `${request.headers.get("x-forwarded-proto") || "https"}://${request.headers.get("host")}`;
 
     const paymentData = {
-      amount: 50.0, 
+      amount: 20.0, 
       currency: "MT",
       description: "Plano Pro",
       redirect_url: `${origin}/successpro`, 
