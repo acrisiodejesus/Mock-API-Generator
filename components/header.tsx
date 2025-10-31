@@ -1,19 +1,27 @@
-"use client"
+"use client";
 
-import { useAuth } from "@/lib/auth-context"
-import { useI18n } from "@/lib/i18n-context"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { useAuth } from "@/lib/auth-context";
+import { useI18n } from "@/lib/i18n-context";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import Image from "next/image";
 
 export function Header() {
-  const { user, signOut } = useAuth()
-  const { locale, setLocale, t } = useI18n()
+  const { user, signOut } = useAuth();
+  const { locale, setLocale, t } = useI18n();
 
   return (
     <header className="border-b border-border bg-card">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <div className="h-6 w-6 text-primary font-bold text-xl">🌐</div>
+          <div className="h-6 w-6 text-primary font-bold text-xl">
+            <Image
+              src={"/logo-black.png"}
+              alt="Logo"
+              width={200}
+              height={200}
+            />
+          </div>
           <span className="text-xl font-bold">{t("app.name")}</span>
         </Link>
 
@@ -22,7 +30,9 @@ export function Header() {
             <button
               onClick={() => setLocale("pt")}
               className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                locale === "pt" ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                locale === "pt"
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-muted"
               }`}
             >
               PT
@@ -30,7 +40,9 @@ export function Header() {
             <button
               onClick={() => setLocale("en")}
               className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                locale === "en" ? "bg-primary text-primary-foreground" : "hover:bg-muted"
+                locale === "en"
+                  ? "bg-primary text-primary-foreground"
+                  : "hover:bg-muted"
               }`}
             >
               EN
@@ -59,5 +71,5 @@ export function Header() {
         </nav>
       </div>
     </header>
-  )
+  );
 }

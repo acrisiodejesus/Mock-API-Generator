@@ -77,7 +77,6 @@ export default function NewAPIPage() {
     setLoading(true);
 
     try {
-      const endpoint = name.trim().toLowerCase().replace(/\s+/g, "-");
       const validFields = fields.filter((f) => f.name.trim() && f.type.trim());
 
       const res = await fetch("/api/user/apis", {
@@ -85,9 +84,8 @@ export default function NewAPIPage() {
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          username: user?.displayName || user?.email?.split("@")[0],
+          userId: user?.uid,
           name,
-          endpoint,
           description,
           fields: validFields,
         }),

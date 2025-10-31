@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    if (!body.userId || !body.name) {
+    if (!body.name) {
       return NextResponse.json({ error: "Campos obrigatórios faltando" }, { status: 400 });
     }
 
@@ -43,10 +43,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Campos inválidos em 'fields'" }, { status: 400 });
     }
 
-    const origin = `${request.headers.get("x-forwarded-proto") || "https"}://${request.headers.get("host")}`;
-    const endpointId = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    const username = body.username || body.displayName || body.email.split("@")[0];
-    const endpoint = `${origin}/api/${username}/${endpointId}`;
+   const origin = `${request.headers.get("x-forwarded-proto") || "https"}://${request.headers.get("host")}`;
+const endpointId = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+const endpoint = `${origin}/api/${body.userId}/${endpointId}`;
+
 
     const usersRef = adminDb.collection("users");
     const userSnapshot = await usersRef.where("uid", "==", body.userId).get();

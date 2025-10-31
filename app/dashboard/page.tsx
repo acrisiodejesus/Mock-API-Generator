@@ -26,6 +26,7 @@ import {
   ExternalLink,
   AlertCircle,
   Crown,
+  StarsIcon,
 } from "lucide-react";
 import {
   AlertDialog,
@@ -179,12 +180,38 @@ export default function DashboardPage() {
               {userPlan?.plan === "pro" && <Crown className="h-3 w-3 mr-1" />}
               {userPlan?.plan === "pro" ? "Pro" : "Free"}
             </Badge>
-            <Link href="/dashboard/new">
-              <Button disabled={!canCreateMore}>
-                <Plus className="h-4 w-4 mr-2" />
-                {t("dashboard.newApi")}
+            {canCreateMore ? (
+              <Link href="/dashboard/new">
+                <Button disabled={!canCreateMore}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  {t("dashboard.newApi")}
+                </Button>
+              </Link>
+            ) : (
+              <Button
+                className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white hover:from-yellow-500 hover:via-orange-600 hover:to-red-600"
+                onClick={async () => {
+                  try {
+                    const res = await fetch("/api/gopro", { method: "POST" });
+                    const data = await res.json();
+
+                    if (data.checkout_url) {
+                      window.location.href = data.checkout_url;
+                    } else {
+                      alert(
+                        "Erro ao criar link de pagamento. Tenta novamente."
+                      );
+                    }
+                  } catch (err) {
+                    console.error("Erro ao iniciar pagamento:", err);
+                    alert("Ocorreu um erro. Tente mais tarde.");
+                  }
+                }}
+              >
+                <StarsIcon className="h-4 w-4 mr-2" />
+                {t("dashboard.goPro")}
               </Button>
-            </Link>
+            )}
           </div>
         </div>
 
