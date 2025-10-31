@@ -108,212 +108,218 @@ export default function DashboardPage() {
       setLoading(false);
     }
   };
-  const handleGoPro = async () => {async () => {
-                  try {
-                    const res = await fetch("/api/gopro", { method: "POST" });
-                    const data = await res.json();
+  const handleGoPro = async () => {
+    async () => {
+      try {
+        const res = await fetch("/api/gopro", { method: "POST" });
+        const data = await res.json();
 
-                    if (data.checkout_url) {
-                      window.location.href = data.checkout_url;
-                    } else {
-                      alert(
-                        "Erro ao criar link de pagamento. Tenta novamente."
-                      );
-                    }
-                  } catch (err) {
-                    console.error("Erro ao iniciar pagamento:", err);
-                    alert("Ocorreu um erro. Tente mais tarde.");
-                  }
-                }
-  const handleDelete = async (id: string) => {
-    if (!user) return;
-
-    try {
-      console.log("Deleting API:", id);
-
-      const res = await fetch(`/api/user/apis/${id}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
-
-      console.log("Delete response status:", res.status);
-
-      if (res.ok) {
-        setApis(apis.filter((api) => api.id !== id));
-        console.log("API deleted successfully");
-      } else {
-        console.error("Failed to delete API:", await res.text());
+        if (data.checkout_url) {
+          window.location.href = data.checkout_url;
+        } else {
+          alert("Erro ao criar link de pagamento. Tenta novamente.");
+        }
+      } catch (err) {
+        console.error("Erro ao iniciar pagamento:", err);
+        alert("Ocorreu um erro. Tente mais tarde.");
       }
-    } catch (error) {
-      console.error("Error deleting API:", error);
+    };
+    const handleDelete = async (id: string) => {
+      if (!user) return;
+
+      try {
+        console.log("Deleting API:", id);
+
+        const res = await fetch(`/api/user/apis/${id}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+
+        console.log("Delete response status:", res.status);
+
+        if (res.ok) {
+          setApis(apis.filter((api) => api.id !== id));
+          console.log("API deleted successfully");
+        } else {
+          console.error("Failed to delete API:", await res.text());
+        }
+      } catch (error) {
+        console.error("Error deleting API:", error);
+      }
+      setDeleteId(null);
+    };
+
+    const copyEndpoint = (endpoint: string) => {
+      navigator.clipboard.writeText(`${endpoint}`);
+    };
+
+    if (authLoading || loading) {
+      return (
+        <div className="min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-1 container mx-auto px-4 py-8">
+            <div className="space-y-4">
+              <Skeleton className="h-12 w-64" />
+              <Skeleton className="h-32 w-full" />
+            </div>
+          </main>
+        </div>
+      );
     }
-    setDeleteId(null);
-  };
 
-  const copyEndpoint = (endpoint: string) => {
-    navigator.clipboard.writeText(`${endpoint}`);
-  };
+    if (!user) return null;
 
-  if (authLoading || loading) {
+    const canCreateMore = userPlan?.plan === "pro" || apis.length < 2;
+
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
+
         <main className="flex-1 container mx-auto px-4 py-8">
-          <div className="space-y-4">
-            <Skeleton className="h-12 w-64" />
-            <Skeleton className="h-32 w-full" />
+          <div className="flex items-center justify-between mb-8">
+            <div>
+              <h1 className="text-3xl font-bold">{t("dashboard.title")}</h1>
+              <p className="text-muted-foreground mt-1">
+                {t("dashboard.subtitle")} - {apis.length}{" "}
+                {userPlan?.plan === "free" ? "/ 2" : ""} APIs
+              </p>
+            </div>
+            <div className="flex items-center gap-3">
+              <Badge
+                variant={userPlan?.plan === "pro" ? "default" : "secondary"}
+                className="text-sm px-3 py-1"
+              >
+                {userPlan?.plan === "pro" && <Crown className="h-3 w-3 mr-1" />}
+                {userPlan?.plan === "pro" ? "Pro" : "Free"}
+              </Badge>
+              {canCreateMore ? (
+                <Link href="/dashboard/new">
+                  <Button disabled={!canCreateMore}>
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t("dashboard.newApi")}
+                  </Button>
+                </Link>
+              ) : (
+                <Button
+                  className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white hover:from-yellow-500 hover:via-orange-600 hover:to-red-600"
+                  onClick={() => handleGoPro()}
+                >
+                  <StarsIcon className="h-4 w-4 mr-2" />
+                  {t("dashboard.goPro")}
+                </Button>
+              )}
+            </div>
           </div>
+
+          {!canCreateMore && (
+            <Alert className="mb-6">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>{t("dashboard.limitReached")}</AlertTitle>
+              <AlertDescription>
+                {t("dashboard.limitReachedDesc")}
+                <Button
+                  variant="link"
+                  className="px-2"
+                  onClick={() => handleGoPro}
+                  asChild
+                >
+                  {t("dashboard.upgradeToPro")}
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {apis.length === 0 ? (
+            <Card>
+              <CardContent className="flex flex-col items-center justify-center py-16">
+                <p className="text-muted-foreground mb-4">
+                  {t("dashboard.noApis")}
+                </p>
+                <Link href="/dashboard/new">
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    {t("dashboard.createFirst")}
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {apis.map((api) => (
+                <Card key={api.id}>
+                  <CardHeader>
+                    <CardTitle>{api.name}</CardTitle>
+                    <CardDescription className="line-clamp-2">
+                      {api.description}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <code className="text-xs bg-muted px-2 py-1 rounded flex-1 truncate">
+                          {api.endpoint}
+                        </code>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => copyEndpoint(api.endpoint)}
+                        >
+                          <Copy className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="flex-1 bg-transparent"
+                      asChild
+                    >
+                      <a
+                        href={api.endpoint}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <ExternalLink className="h-3 w-3 mr-2" />
+                        {t("dashboard.test")}
+                      </a>
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => setDeleteId(api.id)}
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          )}
         </main>
+
+        <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>
+                {t("dashboard.deleteConfirm")}
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                {t("dashboard.deleteConfirmDesc")}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>{t("dashboard.cancel")}</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={() => deleteId && handleDelete(deleteId)}
+              >
+                {t("dashboard.delete")}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     );
-  }
-
-  if (!user) return null;
-
-  const canCreateMore = userPlan?.plan === "pro" || apis.length < 2;
-
-  return (
-    <div className="min-h-screen flex flex-col">
-      <Header />
-
-      <main className="flex-1 container mx-auto px-4 py-8">
-   
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold">{t("dashboard.title")}</h1>
-            <p className="text-muted-foreground mt-1">
-              {t("dashboard.subtitle")} - {apis.length}{" "}
-              {userPlan?.plan === "free" ? "/ 2" : ""} APIs
-            </p>
-          </div>
-          <div className="flex items-center gap-3">
-            <Badge
-              variant={userPlan?.plan === "pro" ? "default" : "secondary"}
-              className="text-sm px-3 py-1"
-            >
-              {userPlan?.plan === "pro" && <Crown className="h-3 w-3 mr-1" />}
-              {userPlan?.plan === "pro" ? "Pro" : "Free"}
-            </Badge>
-            {canCreateMore ? (
-              <Link href="/dashboard/new">
-                <Button disabled={!canCreateMore}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t("dashboard.newApi")}
-                </Button>
-              </Link>
-            ) : (
-              <Button
-                className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 text-white hover:from-yellow-500 hover:via-orange-600 hover:to-red-600"
-                onClick={() => handleGoPro()}
-              >
-                <StarsIcon className="h-4 w-4 mr-2" />
-                {t("dashboard.goPro")}
-              </Button>
-            )}
-          </div>
-        </div>
-
-        {!canCreateMore && (
-          <Alert className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>{t("dashboard.limitReached")}</AlertTitle>
-            <AlertDescription>
-              {t("dashboard.limitReachedDesc")}
-              <Button variant="link" className="px-2" onClick={()=> handleGoPro} asChild>
-                {t("dashboard.upgradeToPro")}
-              </Button>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {apis.length === 0 ? (
-          <Card>
-            <CardContent className="flex flex-col items-center justify-center py-16">
-              <p className="text-muted-foreground mb-4">
-                {t("dashboard.noApis")}
-              </p>
-              <Link href="/dashboard/new">
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  {t("dashboard.createFirst")}
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {apis.map((api) => (
-              <Card key={api.id}>
-                <CardHeader>
-                  <CardTitle>{api.name}</CardTitle>
-                  <CardDescription className="line-clamp-2">
-                    {api.description}
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <code className="text-xs bg-muted px-2 py-1 rounded flex-1 truncate">
-                        {api.endpoint}
-                      </code>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => copyEndpoint(api.endpoint)}
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-                <CardFooter className="flex gap-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 bg-transparent"
-                    asChild
-                  >
-                    <a
-                      href={api.endpoint}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      <ExternalLink className="h-3 w-3 mr-2" />
-                      {t("dashboard.test")}
-                    </a>
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    onClick={() => setDeleteId(api.id)}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
-        )}
-      </main>
-
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{t("dashboard.deleteConfirm")}</AlertDialogTitle>
-            <AlertDialogDescription>
-              {t("dashboard.deleteConfirmDesc")}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{t("dashboard.cancel")}</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => deleteId && handleDelete(deleteId)}
-            >
-              {t("dashboard.delete")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
+  };
 }
