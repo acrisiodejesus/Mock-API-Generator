@@ -13,13 +13,10 @@ export default function Home() {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-
       <main className="flex-1">
         <div className="container mx-auto px-4 pt-6">
           <FirebaseSetupBanner />
         </div>
-
-        {/* Hero Section */}
         <section className="container mx-auto px-4 py-24 text-center">
           <div className="max-w-4xl mx-auto space-y-6">
             <h1 className="text-5xl md:text-6xl font-bold leading-tight text-balance">
@@ -46,8 +43,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        {/* Features */}
         <section className="container mx-auto px-4 py-16">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-card border border-border rounded-lg p-6 space-y-3">
@@ -99,8 +94,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        {/* How it works */}
         <section className="container mx-auto px-4 py-16">
           <div className="max-w-3xl mx-auto space-y-8">
             <h2 className="text-3xl font-bold text-center">
@@ -152,8 +145,6 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        {/* Pricing Section */}
         <section id="pricing" className="container mx-auto px-4 py-16">
           <div className="max-w-5xl mx-auto space-y-8">
             <div className="text-center space-y-4">
@@ -161,7 +152,6 @@ export default function Home() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-6 max-w-3xl mx-auto">
-              {/* Free Plan */}
               <div className="bg-card border border-border rounded-lg p-8 space-y-6">
                 <div>
                   <h3 className="text-2xl font-bold">

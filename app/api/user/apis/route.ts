@@ -45,8 +45,8 @@ export async function POST(request: Request) {
 
     const origin = `${request.headers.get("x-forwarded-proto") || "https"}://${request.headers.get("host")}`;
     const endpointId = body.name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-   const username = body.username || body.displayName || body.email.split("@")[0];
-const endpoint = `${origin}/api/${username}/${endpointId}`;
+    const username = body.username || body.displayName || body.email.split("@")[0];
+    const endpoint = `${origin}/api/${username}/${endpointId}`;
 
     const usersRef = adminDb.collection("users");
     const userSnapshot = await usersRef.where("uid", "==", body.userId).get();

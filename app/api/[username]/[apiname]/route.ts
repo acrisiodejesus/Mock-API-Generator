@@ -10,10 +10,9 @@ export async function GET(request: Request, { params }: { params: { username: st
       return NextResponse.json({ error: "Database not configured" }, { status: 500 });
     }
 
-    // Busca API pelo usuário e nome da API
     const apisSnapshot = await adminDb
       .collection("apis")
-      .where("userId", "==", username) // ou ajustar para seu campo de username
+      .where("userId", "==", username) 
       .where("name", "==", apiname)
       .limit(1)
       .get();
@@ -50,7 +49,7 @@ export async function GET(request: Request, { params }: { params: { username: st
   }
 }
 
-// Bloqueia outros métodos
+
 export async function POST() { return NextResponse.json({ error: "Método não permitido" }, { status: 405 }) }
 export async function PUT() { return NextResponse.json({ error: "Método não permitido" }, { status: 405 }) }
 export async function DELETE() { return NextResponse.json({ error: "Método não permitido" }, { status: 405 }) }
