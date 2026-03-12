@@ -21,8 +21,8 @@ To ensure rapid global deployment and scalable real-time databases, I engineered
 
 * **Core Framework:** Next.js (React) - Utilized for both the frontend dashboard and serverless API route handling.
 * **Database & Auth:** Firebase (Firestore & Firebase Auth) - Selected for real-time document storage and secure, multi-provider user authentication.
-* **Monetization Engine:** [RIHA] - Fully integrated for handling subscriptions, usage-based billing, and secure webhook processing.
-* **Styling:** [Shadcn UI] - Ensuring a clean, responsive administrative dashboard.
+* **Monetization Engine:** RIHA - Fully integrated for handling subscriptions, usage-based billing, and secure webhook processing.
+* **Styling:** Shadcn UI - Ensuring a clean, responsive administrative dashboard.
 
 ---
 
